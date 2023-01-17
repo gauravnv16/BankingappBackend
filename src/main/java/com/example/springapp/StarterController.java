@@ -196,5 +196,44 @@ public class StarterController implements CommandLineRunner {
         }
 
     }
+
+    // get Transactions by account number
+
+    @CrossOrigin(origins = "http://localhost:8081/")
+    @PostMapping("/transaction")
+    public String USER_TRANSACTION(@RequestBody String accn){
+
+        String sql = "select * from transactions where ACCOUNT_NUMBER=?";
+        try{
+            List<Transaction> usrs = jdbcTemplate.query(
+                sql, 
+                (rs, rowNum) -> 
+                        new Transaction(
+                            rs.getInt("ID"),
+                            rs.getString("ACCOUNT_NUMBER"),
+                            rs.getInt("AMOUNT"),
+                            rs.getString("TRANSFERED_ACCOUNT_NUMBER"),
+                            rs.getString("TRANSACTION_TYPE"),
+                            rs.getString("TRANSACTION_DATE"),
+                            rs.getString("DESCRIPTION")
+                        ),
+                accn
+            );
+
+            String res = "[";
+            for(Transaction user : usrs) {
+                res += user.getTransaction();
+            }
+            res = res.substring(0, res.length() - 1);
+            res += "]";
+
+            return res;
+            
+        }catch(Exception e){
+            return e.getMessage();
+        }
+
+    }
+
     
 }
