@@ -198,7 +198,6 @@ public class StarterController implements CommandLineRunner {
     }
 
     // get Transactions by account number
-
     @CrossOrigin(origins = "http://localhost:8081/")
     @PostMapping("/transaction")
     public String USER_TRANSACTION(@RequestBody String accn){
@@ -249,6 +248,26 @@ public class StarterController implements CommandLineRunner {
             jdbcTemplate.update(sql2, funds.getACCOUNT_NUMBER(), funds.getAMOUNT(),funds.getACCOUNT_NUMBER() ,"DEPOSIT", "RECHARGE ACCOUNT");
 
             return "{\"message\" : \"Funds Added Successfully\"}";
+        }catch(Exception e){
+            return e.getMessage();
+        }
+    }
+
+    // transfer funds to accountnumber
+    @CrossOrigin(origins = "http://localhost:8081/")
+    @PostMapping("/transferfunds")
+    public String TRANSFER_FUNDS(@RequestBody SendFunds funds){
+        String sql = "update accounts set BALANCE = BALANCE - ? where ACCOUNT_NUMBER = ?";
+        String sql3 = "update accounts set BALANCE = BALANCE + ? where ACCOUNT_NUMBER = ?";
+        try{
+            jdbcTemplate.update(sql, funds.getAMOUNT(), funds.getSENDER_ACCOUNT_NUMBER());
+            jdbcTemplate.update(sql3, funds.getAMOUNT(), funds.getRECEIVER_ACCOUNT_NUMBER());
+
+            String sql2 = "insert into transactions (ACCOUNT_NUMBER, AMOUNT,TRANSFERED_ACCOUNT_NUMBER ,TRANSACTION_TYPE,DESCRIPTION) values (?, ?, ?, ?, ?)";
+
+            jdbcTemplate.update(sql2, funds.getSENDER_ACCOUNT_NUMBER(), funds.getAMOUNT(),funds.getRECEIVER_ACCOUNT_NUMBER() ,"TRANSFER", "TRANSFER FUNDS");
+
+            return "{\"message\" : \"Funds Transferred Successfully\"}";
         }catch(Exception e){
             return e.getMessage();
         }
