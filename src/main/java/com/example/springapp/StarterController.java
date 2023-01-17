@@ -160,5 +160,41 @@ public class StarterController implements CommandLineRunner {
         }
 
     }
+
+    // get Transactions 
+    @CrossOrigin(origins = "http://localhost:8081/")
+    @GetMapping("/transactions")
+    public String USER_TRANSACTIONS(){
+
+        String sql = "select * from transactions";
+        try{
+            List<Transaction> usrs = jdbcTemplate.query(
+                sql, 
+                (rs, rowNum) -> 
+                        new Transaction(
+                            rs.getInt("ID"),
+                            rs.getString("ACCOUNT_NUMBER"),
+                            rs.getInt("AMOUNT"),
+                            rs.getString("TRANSFERED_ACCOUNT_NUMBER"),
+                            rs.getString("TRANSACTION_TYPE"),
+                            rs.getString("TRANSACTION_DATE"),
+                            rs.getString("DESCRIPTION")
+                        )
+            );
+
+            String res = "[";
+            for(Transaction user : usrs) {
+                res += user.getTransaction();
+            }
+            res = res.substring(0, res.length() - 1);
+            res += "]";
+
+            return res;
+            
+        }catch(Exception e){
+            return e.getMessage();
+        }
+
+    }
     
 }
