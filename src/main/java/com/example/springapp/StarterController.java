@@ -235,5 +235,23 @@ public class StarterController implements CommandLineRunner {
 
     }
 
+    // add funds to accountnumber
+    @CrossOrigin(origins = "http://localhost:8081/")
+    @PostMapping("/addfunds")
+    public String ADD_FUNDS(@RequestBody AddFunds funds){
+        String sql = "update accounts set BALANCE = BALANCE + ? where ACCOUNT_NUMBER = ?";
+
+        try{
+            jdbcTemplate.update(sql, funds.getAMOUNT(), funds.getACCOUNT_NUMBER());
+
+            String sql2 = "insert into transactions (ACCOUNT_NUMBER, AMOUNT,TRANSFERED_ACCOUNT_NUMBER ,TRANSACTION_TYPE,DESCRIPTION) values (?, ?, ?, ?, ?)";
+
+            jdbcTemplate.update(sql2, funds.getACCOUNT_NUMBER(), funds.getAMOUNT(),funds.getACCOUNT_NUMBER() ,"DEPOSIT", "RECHARGE ACCOUNT");
+
+            return "{\"message\" : \"Funds Added Successfully\"}";
+        }catch(Exception e){
+            return e.getMessage();
+        }
+    }
     
 }
