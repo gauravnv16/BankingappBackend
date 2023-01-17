@@ -272,5 +272,20 @@ public class StarterController implements CommandLineRunner {
             return e.getMessage();
         }
     }
+
+    // approve user
+    @CrossOrigin(origins = "http://localhost:8081/")
+    @PostMapping("/approve")
+    public String APPROVE_USER(@RequestBody String id){
+        String sql = "update user_account set ISAPPROVED = true where ID= ?";
+
+        try{
+            jdbcTemplate.update(sql, id);
+
+            return "{\"message\" : \"User Approved Successfully\"}";
+        }catch(Exception e){
+            return e.getMessage();
+        }
+    }
     
 }
